@@ -1,0 +1,101 @@
+import socket
+import sys
+import time
+import logging
+ 
+# Setup logging
+logging.basicConfig(level=logging.INFO)
+ 
+# === IP CONFIGURATION ===
+LOCAL_IPS = [
+    "192.168.10.2",  # Drone 1 - front left (leader)
+    "192.168.10.3",  # Drone 2 - front right
+    "192.168.10.4",  # Drone 3 - back left
+    "192.168.10.5",  # Drone 4 - back right
+]
+TELLO_IP = "192.168.10.1"
+TELLO_PORT = 8889
+ 
+# === SOCKET SETUP ===
+sockets = []
+try:
+    for ip in LOCAL_IPS:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.bind((ip, TELLO_PORT))
+        sockets.append(sock)
+except Exception as e:
+    logging.error("Error creating or binding sockets", exc_info=True)
+    sys.exit(1)
+ 
+# === GLOBAL STATE ===
+TELLO_ADDRESS = (TELLO_IP, TELLO_PORT)
+combined_log = []
+flight_in_progress = True
+ 
+ 
+# === COMMANDING FUNCTIONS ===
+def send_command(sock, name, command, delay=3):
+    try:
+        sock.sendto(command.encode(), TELLO_ADDRESS)
+        timestamp = time.time()
+        logging.info(f"[{name}] Sent command: {command}")
+        combined_log.append((name, command, timestamp))
+        time.sleep(delay)
+    except Exception as e:
+        logging.error(f"[{name}] Failed to send command: {command}", exc_info=True)
+ 
+ 
+def broadcast_command(command, delay=3):
+    for i, sock in enumerate(sockets):
+        send_command(sock, f"Drone{i + 1}", command, delay=0)
+    time.sleep(delay)
+ 
+ 
+# === STRATEGY: BACK PAIR MOVES FORWARD ===
+def mock_capture_back_pair_moves_forward():
+    logging.info("Starting mock capture: back pair moves forward to front pair")
+ 
+    broadcast_command("command", delay=1)
+    broadcast_command("takeoff", delay=5)
+    broadcast_command("up 30", delay=3)
+ 
+    # Step 1: Front and back pairs form (already done previously)
+    # For testing completeness, simulate starting positions
+ 
+    # Front drones come together
+    send_command(sockets[0], "Drone1", "right 30", delay=1)
+    send_command(sockets[1], "Drone2", "left 30", delay=1)
+ 
+    # Back drones come together
+    send_command(sockets[2], "Drone3", "right 30", delay=1)
+    send_command(sockets[3], "Drone4", "left 30", delay=1)
+ 
+    time.sleep(2)
+ 
+    # Step 2: Back drones move forward toward the front drones
+    send_command(sockets[2], "Drone3", "forward 40", delay=1)
+    send_command(sockets[3], "Drone4", "forward 40", delay=1)
+ 
+    time.sleep(2)
+    broadcast_command("land", delay=5)
+ 
+ 
+# === MAIN EXECUTION ===
+def main():
+    try:
+        # ✏️ CHOOSE STRATEGY HERE
+        capture_strategy = mock_capture_back_pair_moves_forward
+ 
+        # 🚀 RUN SELECTED STRATEGY
+        capture_strategy()
+ 
+    except KeyboardInterrupt:
+        logging.warning("Interrupted. Landing all drones.")
+        broadcast_command("land", delay=5)
+    finally:
+        for sock in sockets:
+            sock.close()
+ 
+ 
+if __name__ == "__main__":
+    main()
