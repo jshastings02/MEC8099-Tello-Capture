@@ -5,3 +5,5 @@ This Github repository contains code used and referenced in the MEC8099 Group Pr
 On line 64 of the code you will need to update the path to wherever you have saved best.pt on your device.
 
 'Enclosing_method' provides an independent coding protocol for shortening the distance between drones, to encapsulate the captured object. This can be tested directly without updating any lines.
+
+'Leader_switch' is an independant code with the algorithm for a failsafe mechanism which allows a follower to take over as the leader in case of loss of control of the starting leader. 
