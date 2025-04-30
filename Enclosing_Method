@@ -83,10 +83,10 @@ def mock_capture_back_pair_moves_forward():
 # === MAIN EXECUTION ===
 def main():
     try:
-        # ✏️ CHOOSE STRATEGY HERE
+        # CHOOSE STRATEGY HERE
         capture_strategy = mock_capture_back_pair_moves_forward
  
-        # 🚀 RUN SELECTED STRATEGY
+        # RUN SELECTED STRATEGY
         capture_strategy()
  
     except KeyboardInterrupt:
