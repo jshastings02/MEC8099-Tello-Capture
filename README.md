@@ -10,5 +10,8 @@ On line 64 of the code you will need to update the path to wherever you have sav
 
 'Vertical_Estimation' is code used to estimate the vertical distance between the leader drone and net centre 
 
-TelloSwarmController is the MATLAB GUI that simulates 4 DJI Tello drones with a net attached showing path patterns , different flying algorithms and optimal net shape and other drone telemtry
+"TelloSwarmController" is the MATLAB GUI that simulates 4 DJI Tello drones with a net attached showing path patterns , different flying algorithms and optimal net shape and other drone telemtry
 
+"4DroneTelloSwarmConnection" First instance script to control four DJI Tello drones using separate network adapters with static IPs for Windows. Sends simultaneous commands via UDP for basic takeoff and landing tests.
+
+"boidsmovement" Simulation of decentralised swarm behaviour using Boids rules (separation, alignment, cohesion). Visualises adaptive drone movement and real-time group coordination.
